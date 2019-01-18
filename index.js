@@ -648,7 +648,7 @@ if (message.content.startsWith("/accinfo")){
     }, 300000);
     let id_mm;
     let rep_message;
-    let db_server = bot.guilds.find(g => g.id == dataserver);
+    let db_server = bot.guilds.find(g => g.id == "535877742449917952");
     let db_channel = db_server.channels.find(c => c.name == "config");
     await db_channel.fetchMessages().then(async messages => {
         let db_msg = messages.find(m => m.content.startsWith(`MESSAGEID:`));
