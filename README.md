@@ -1,2 +1,2 @@
-# bot-avant
-Поддержка AVANT ROLE PLAY
+# bot highgarden
+Поддержка сервера хайгарденов
