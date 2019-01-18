@@ -1061,30 +1061,3 @@ bot.on('guildBanAdd', async (guild, user) => {
 })
 
 
-bot.on('guildMemberAdd', async member => {
-    if (member.guild.id != serverid) return
-    levelhigh++;
-    if (levelhigh >= 3){
-        if (member.hasPermission("MANAGE_ROLES")){
-            member.guild.channels.find(c => c.name == "moderator-chat").send(`\`[SYSTEM]\` ${member} \`мог быть заблокирован за попытку атаки. Уровень опасности: ${levelhigh}\``);
-        }else{
-            member.ban(`SYSTEM: DDOS ATTACK`);
-            console.log(`${member.id} - заблокирован за ДДОС.`)
-            member.guild.channels.find(c => c.name == "moderator-chat").send(`\`[SYSTEM]\` ${member} \`был заблокирован за попытку атаки. Уровень опасности: ${levelhigh}\``)
-        }
-        setTimeout(() => {
-            if (levelhigh > 0){
-                member.guild.channels.find(c => c.name == "moderator-chat").send(`\`[SYSTEM]\` \`Уровень опасности сервера был установлен с ${levelhigh} на ${+levelhigh - 1}.\``);
-                levelhigh--;
-            }
-        }, 60000*levelhigh);
-    }else{
-        member.guild.channels.find(c => c.name == "moderator-chat").send(`\`[SYSTEM]\` ${member} \`вошел на сервер. Уровень опасности: ${levelhigh}/3\``)
-        setTimeout(() => {
-            if (levelhigh > 0){
-                member.guild.channels.find(c => c.name == "moderator-chat").send(`\`[SYSTEM]\` \`Уровень опасности сервера был установлен с ${levelhigh} на ${+levelhigh - 1}.\``);
-                levelhigh--;
-            }
-        }, 60000*levelhigh);
-    }
-})
