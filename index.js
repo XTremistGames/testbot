@@ -692,7 +692,7 @@ if (message.content.startsWith("/accinfo")){
         message.delete();    
         await channel.setParent(s_category.id);
         await channel.setTopic('Жалоба в обработке.')
-        let moderator_role = await message.guild.roles.find(r => r.name == 'Support Team');
+        let moderator_role = await message.guild.roles.find(r => r.name == '🔧 Support Team™');
         await channel.overwritePermissions(moderator_role, {
         // GENERAL PERMISSIONS
         CREATE_INSTANT_INVITE: false,
@@ -762,6 +762,7 @@ if (message.content.startsWith("/accinfo")){
         await sp_chat_get.send(`\`[CREATE]\` <@${message.author.id}> \`создал обращение к поддержке:\` <#${channel.id}>`);
         message.channel.send(`<@${message.author.id}>, \`обращение составлено. Нажмите на\` <#${channel.id}>`).then(msg => msg.delete(15000));
     });
+	}
 });
 
 
