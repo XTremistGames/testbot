@@ -961,7 +961,6 @@ if (message.content == '/active'){
 
 
 
-/*
 bot.on('guildMemberUpdate', async (oldMember, newMember) => {
     if (newMember.guild.id != "533735526914588673") return // Сервер не 03!
     if (oldMember.roles.size == newMember.roles.size) return // Сменил ник или еще чет!
@@ -1030,7 +1029,7 @@ bot.on('guildMemberUpdate', async (oldMember, newMember) => {
         }
     }
 })
-*/
+
 bot.on('guildBanAdd', async (guild, user) => {
     if (guild.id != serverid) return
     setTimeout(async () => {
