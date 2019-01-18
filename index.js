@@ -49,7 +49,7 @@ bot.on("ready", async () => {
   console.log(`Автор бота: Луняша`);
   console.log(`Автор некоторых систем: Kory_McGregor (Артём Мясников)`);
   //bot.guilds.find(g => g.id == "474975625011003393").channels.find(c => c.name == "general-startbot").send(`\`Бот МакДак запущен!\``);
- bot.user.setActivity("supporting 24\7 by Yuki", {type: "WATCHING"}, "https://vk.com/shixan18");
+ bot.user.setGame("supporting 24\7 by Yuki", "https://vk.com/shixan18");
 
   //bot.user.setGame("on SourceCade!");
 });
