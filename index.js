@@ -4,6 +4,7 @@ const Discord = require("discord.js");
 const fs = require("fs");
 const bot = new Discord.Client({disableEveryone: true});
 const serverid = '533735526914588673';
+const dataserver = '';
 //const backup_serverid = "533735526914588673";
 
 let antislivsp1 = new Set();
@@ -49,7 +50,7 @@ bot.on("ready", async () => {
   console.log(`Автор бота: Луняша`);
   console.log(`Автор некоторых систем: Kory_McGregor (Артём Мясников)`);
   //bot.guilds.find(g => g.id == "474975625011003393").channels.find(c => c.name == "general-startbot").send(`\`Бот МакДак запущен!\``);
- bot.user.setActivity('supporting 24\7 by Yuki', { type: 'WATCHING' })
+ bot.user.setActivity('supporting 24 na 7 by Yuki', { type: 'WATCHING' })
 
   //bot.user.setGame("on SourceCade!");
 });
