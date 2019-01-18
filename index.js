@@ -545,6 +545,12 @@ bot.on('message', async message => {
     if (message.content == "/ping") return message.reply("`я онлайн!`") && console.log(`Бот ответил ${message.member.displayName}, что я онлайн.`)
     if(message.author.bot) return;
 	let re = /(\d+(\.\d)*)/i;
+	
+	if (message.content == '/reset_ddos'){
+        if (!message.member.hasPermission("MANAGE_ROLES")) return message.reply(`нет прав.`)
+        levelhigh = 0;
+        message.channel.send(`\`[SYSTEM]\` \`Уровень опасности сервера был установлен на 0. Источник: ${message.member.displayName}\``)
+    }
 
 if (message.content.startsWith("/accinfo")){
         if (!message.member.hasPermission("MANAGE_ROLES")) return
