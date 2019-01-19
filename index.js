@@ -441,7 +441,7 @@ bot.on('message', async message => {
             if (!args[3]) return message.delete();
             if (!args[4]) return message.delete();
             if (!args[5]) return message.delete();
-            if (args[2] != "493459379878625320" && args[2] != "521639035442036736"){
+            if (args[2] != "527851904936706067" && args[2] != "535877742449917952"){
                 message.channel.send(`\`[ERROR]\` ${message.member} \`сервер '${args[2]}' не назначен как БД.\``);
                 return message.delete();
             }
