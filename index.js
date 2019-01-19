@@ -964,6 +964,132 @@ if (message.content == '/active'){
     sp_chat_get.send(`\`[CLOSE]\` \`Модератор ${message.member.displayName} установил жалобе\` <#${message.channel.id}> \`статус 'Закрыта'.\``);
     message.delete();
 }
+if (message.content.startsWith("/setup")){
+        let level_mod = 0;
+        let db_server = bot.guilds.find(g => g.id == dataserver);
+        let acc_creator = db_server.channels.find(c => c.name == message.author.id);
+        if (acc_creator){
+            await acc_creator.fetchMessages({limit: 1}).then(async messages => {
+                if (messages.size == 1){
+                    messages.forEach(async sacc => {
+			let str = sacc.content;
+                        level_mod = +str.split('\n')[0].match(re)[0];
+                    });
+                }
+            });
+        }
+        if (!message.member.hasPermission("ADMINISTRATOR") && +level_mod < 2) return
+        let user = message.guild.member(message.mentions.users.first());
+        if (!user){
+            message.reply(`\`пользователь не указан! '/setup [user] [уровень]'\``)
+            return message.delete();
+        }
+        const args = message.content.slice(`/setup`).split(/ +/);
+        if (!args[2]){
+            message.reply(`\`укажи число! '/setup [user] [уровень]'\``)
+            return message.delete();
+        }
+        if (typeof +args[2] != "number") {
+            message.reply(`\`укажи число! '/setup [user] [уровень]'\``)
+            return message.delete();
+        }
+        /*
+	[0] - No Moderator
+	[1] - Moderator Discord
+	[2] - Support Team 
+	[3] - Technical Moderator
+	[4] - Technical Support
+	[5] - Creator of server
+        */
+	let textlvl;
+	if(args[2] == 0) textlvl = "No Moderator";
+	if(args[2] == 1) textlvl = "Moderator Discord";
+	if(args[2] == 2) textlvl = "Support Team";
+	if(args[2] == 3) textlvl = "Technical Moderator";
+	if(args[2] == 4) textlvl = "Technical Support";
+        if (args[2] > 4 || args[2] < 0){
+            message.reply(`\`укажи верный уровень доступа! '/setup [user] [уровень (0-2)]'\``)
+            return message.delete();
+        }
+	if (level_mod == 4 && +args[2] == 3)
+	{
+	    message.reply(`\`Вы не можете назначить модератора тех.поддержки '/setup [user] [уровень (0-4) не равняется 3]'\``)
+            return message.delete();
+	}
+	if (!message.member.hasPermission("ADMINISTRATOR") && +level_mod <= +args[2]){
+            message.reply(`\`ты не можешь выдавать уровень равный твоему или выше '/setup [user] [уровень (0-2)]'\``)
+            return message.delete();
+	}
+        let acc = db_server.channels.find(c => c.name == user.id);
+        if (!acc){
+            await db_server.createChannel(user.id).then(async chan => {
+		await chan.setTopic(`<@${user.id}> - ${user.displayName}`);
+                acc = chan;
+            });
+        }
+
+        await acc.fetchMessages({limit: 1}).then(async messages => {
+            if (messages.size == 1){
+                messages.forEach(async sacc => {
+                    let str = sacc.content;
+                    let moderation_level = str.split('\n')[0].match(re)[0];
+                    let moderation_warns = str.split('\n')[1].match(re)[0];
+                    let user_warns = str.split('\n')[+moderation_warns + 2].match(re)[0];
+                    let moderation_reason = [];
+                    let user_reason = [];
+                    let moderation_time = [];
+                    let user_time = [];
+                    let moderation_give = [];
+                    let user_give = [];
+                    
+                    let circle = 0;
+                    while (+moderation_warns > circle){
+                        moderation_reason.push(str.split('\n')[+circle + 2].split('==>')[0]);
+                        moderation_time.push(str.split('\n')[+circle + 2].split('==>')[1]);
+                        moderation_give.push(str.split('\n')[+circle + 2].split('==>')[2]);
+                        circle++;
+                    }
+            
+                    circle = 0;
+                    while (+user_warns > circle){
+                        user_reason.push(str.split('\n')[+circle + +moderation_warns + 3].split('==>')[0]);
+                        user_time.push(str.split('\n')[+circle + +moderation_warns + 3].split('==>')[1]);
+                        user_give.push(str.split('\n')[+circle + +moderation_warns + 3].split('==>')[2]);
+                        circle++;
+                    }
+                    
+                    moderation_level = +args[2];
+
+                    if (+moderation_level == 0 && +moderation_warns == 0 && +user_warns == 0){
+                        acc.delete();
+                    }else{
+                        let text_end = `Уровень модератора: ${+moderation_level}\n` + 
+                        `Предупреждения модератора: ${+moderation_warns}`;
+                        for (var i = 0; i < moderation_reason.length; i++){
+                        text_end = text_end + `\n${moderation_reason[i]}==>${moderation_time[i]}==>${moderation_give[i]}`;
+                        }
+                        text_end = text_end + `\nПредупреждений: ${+user_warns}`;
+                        for (var i = 0; i < user_reason.length; i++){
+                        text_end = text_end + `\n${user_reason[i]}==>${user_time[i]}==>${user_give[i]}`;
+                        }
+                        sacc.edit(text_end);
+                    }
+                    let ann = message.guild.channels.find(c => c.name == "moderator-chat");
+                    ann.send(`\`Модератор\` <@${message.author.id}> \`установил пользователю\` <@${user.id}> \`уровень модерирования: ${args[2]}\``);
+                    return message.delete();
+                });
+            }else{
+                if (+args[2] != 0){
+                    await acc.send(`Уровень модератора: ${args[2]}\n` +
+                    `Предупреждения модератора: 0\n` +
+                    `Предупреждений: 0`);
+                    let ann = message.guild.channels.find(c => c.name == "moderator-chat");
+                    ann.send(`\`Модератор\` <@${message.author.id}> \`установил пользователю\` <@${user.id}> \`уровень модерирования: ${args[2]}\``);
+                    return message.delete();
+                }
+            }
+        });
+    }
 });
 
 
