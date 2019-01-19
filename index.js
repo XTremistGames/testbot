@@ -978,7 +978,7 @@ if (message.content.startsWith("/setup")){
                 }
             });
         }
-        if (!message.member.hasPermission("ADMINISTRATOR") && +level_mod < 2) return
+        if (!message.member.hasPermission("ADMINISTRATOR") && +level_mod < 4) return
         let user = message.guild.member(message.mentions.users.first());
         if (!user){
             message.reply(`\`пользователь не указан! '/setup [user] [уровень]'\``)
@@ -1075,7 +1075,7 @@ if (message.content.startsWith("/setup")){
                         sacc.edit(text_end);
                     }
                     let ann = message.guild.channels.find(c => c.name == "moderator-chat");
-                    ann.send(`\`Модератор\` <@${message.author.id}> \`установил пользователю\` <@${user.id}> \`уровень модерирования: ${args[2]}\``);
+                    ann.send(`\`Модератор\` <@${message.author.id}> \`установил пользователю\` <@${user.id}> \`уровень модерирования: ${textlvl}\``);
                     return message.delete();
                 });
             }else{
@@ -1084,7 +1084,7 @@ if (message.content.startsWith("/setup")){
                     `Предупреждения модератора: 0\n` +
                     `Предупреждений: 0`);
                     let ann = message.guild.channels.find(c => c.name == "moderator-chat");
-                    ann.send(`\`Модератор\` <@${message.author.id}> \`установил пользователю\` <@${user.id}> \`уровень модерирования: ${args[2]}\``);
+                    ann.send(`\`Модератор\` <@${message.author.id}> \`установил пользователю\` <@${user.id}> \`уровень модерирования: ${textlvl}\``);
                     return message.delete();
                 }
             }
