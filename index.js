@@ -770,6 +770,34 @@ if (message.content.startsWith("/accinfo")){
         message.channel.send(`<@${message.author.id}>, \`обращение составлено. Нажмите на\` <#${channel.id}>`).then(msg => msg.delete(15000));
     });
 	}
+	if (message.content.toLowerCase().startsWith(`/bug`)){
+    const args = message.content.slice('/bug').split(/ +/);
+    if (!args[1]){
+        message.reply(`\`привет! Для отправки отчета об ошибках используй: /bug [текст]\``).then(msg => msg.delete(15000));
+        return message.delete()
+    }
+    let bugreport = args.slice(1).join(" ");
+    if (bugreport.length < 5 || bugreport.length > 200){
+        message.reply(`\`нельзя отправить запрос с длинной меньше 5 или больше 200 символов!\``).then(msg => msg.delete(15000));
+        return message.delete()
+    }
+
+let nickname = message.member.displayName;
+const embed = new Discord.RichEmbed()
+.setTitle("`Discord » Репорт`")
+.setColor("#483D8B")
+.addField("Аккаунт", `\`Пользователь:\` <@${message.author.id}>`, true)
+.addField("Никнейм", `\`Ник:\` ${nickname}`, true)
+.addField("Отправлено с канала", `<#${message.channel.id}>`)
+.addField("Суть обращения", bugreport)
+.setFooter("© Support Team | by Kory_McGregor")
+.setTimestamp()
+let server_cip = bot.guilds.find(g => g.id == "527851904936706067");
+let bug_tracker = server_cip.channels.find(c => c.name == "bug-tracker");
+let msg = bug_tracker.send(embed);
+await msg.react("✔");
+await msg.react("❌");
+}
 if (message.content == '/hold'){
     if (!message.member.hasPermission("MANAGE_ROLES")) return message.delete();
     if (!message.channel.name.startsWith('ticket-')) return message.delete();
@@ -1214,5 +1242,65 @@ bot.on('guildMemberAdd', async member => {
         }, 60000*levelhigh);
     }
 })
+
+
+bot.on('raw', async event => {
+    if (!events.hasOwnProperty(event.t)) return; // Если не будет добавление или удаление смайлика, то выход
+    if (event.t == "MESSAGE_REACTION_ADD"){
+        let event_guildid = event.d.guild_id // ID discord сервера
+        let event_channelid = event.d.channel_id // ID канала
+        let event_userid = event.d.user_id // ID того кто поставил смайлик
+        let event_messageid = event.d.message_id // ID сообщение куда поставлен смайлик
+        let event_emoji_name = event.d.emoji.name // Название смайлика
+        let server_high = bot.guilds.find(g => g.id == "533735526914588673");
+
+        if (event_userid == bot.user.id) return // Если поставил смайлик бот то выход
+        if (event_guildid != serverid) return // Если сервер будет другой то выход
+
+        let server = bot.guilds.find(g => g.id == event_guildid); // Получить сервер из его ID
+        let channel = server.channels.find(c => c.id == event_channelid); // Получить канал на сервере по списку каналов
+        let message = await channel.fetchMessage(event_messageid); // Получить сообщение из канала
+        let member = server.members.find(m => m.id == event_userid); // Получить пользователя с сервера
+
+        if (channel.name != `bug-tracker`) return // Если название канала не будет 'requests-for-roles', то выйти
+         if(event_emoji_name == "❌"){
+            if (message.embeds[0].title == '`Discord » Репорт`'){
+                if (message.reactions.size != 2){
+                    return channel.send(`\`[ERROR]\` \`Не торопись! Сообщение еще загружается!\``)
+                }
+                let field_user = server_high.members.find(m => "<@" + m.id + ">" == message.embeds[0].fields[0].value.split(/ +/)[1]);
+                let field_nickname = message.embeds[0].fields[1].value.split(`\`Ник:\` `)[1];
+                //let field_role = server.roles.find(r => "<@&" + r.id + ">" == message.embeds[0].fields[2].value.split(/ +/)[3]);
+                let field_channel = server_high.channels.find(c => "<#" + c.id + ">" == message.embeds[0].fields[2].value.split(/ +/)[0]);
+                channel.send(`\`[DENY]\` <@${member.id}> \`отклонил репорт от ${field_nickname}, с ID: ${field_user.id}\``);
+                let rank;
+                if(member.id == "408740341135704065") rank = "Разработчик";
+                else rank = "Владелец сервера";
+                field_channel.send(`<@${field_user.id}>**,** \`${rank}\` <@${member.id}> \`рассмотрел ваш репорт в службу поддержки разработки бота. Ответ: отклонено\``)
+                return message.delete();
+        }else if (event_emoji_name == "✔"){
+            if (message.embeds[0].title == '`Discord » Репорт`'){
+                if (message.reactions.size != 2){
+                    return channel.send(`\`[ERROR]\` \`Не торопись! Сообщение еще загружается!\``)
+                }
+                let field_user = server.members.find(m => "<@" + m.id + ">" == message.embeds[0].fields[0].value.split(/ +/)[1]);
+                let field_nickname = message.embeds[0].fields[1].value.split(`\`Ник:\` `)[1];
+                let field_channel = server.channels.find(c => "<#" + c.id + ">" == message.embeds[0].fields[2].value.split(/ +/)[0]);
+                if (!member.hasPermission("ADMINISTRATOR")){
+                    if (!member.roles.some(r => ["☼ Dev Team ☼"].includes(r.name))){
+                        return channel.send(`\`[ERROR]\` <@${member.id}> \`ошибка прав доступа. Вам нужно стать разработчиком для подтверждения репорта\``).then(msg => msg.delete(12000));
+                    }
+                }
+
+                await field_user.addRole(field_role); // Выдать роль по соответствию с тэгом
+                channel.send(`\`[ACCEPT]\` <@${member.id}> \`одобрил репорт от ${field_nickname}, с ID: ${field_user.id}\``);
+                field_channel.send(`<@${field_user.id}>**,** \`Разработчик\` <@${member.id}> \`рассмотрел ваш репорт в службу поддержки разработки бота. Ответ: принято, будет исправлено/создано\``);
+               // if (sened.has(field_nickname)) sened.delete(field_nickname); // Отметить ник, что он не отправлял запрос
+                return message.delete();
+            }
+        }
+    }
+}
+});
 
 
