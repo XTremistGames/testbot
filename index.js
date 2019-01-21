@@ -782,24 +782,23 @@ if (message.content.startsWith("/accinfo")){
         return message.delete()
     }
 
-let nickname = message.member.displayName;
-const embed = new Discord.RichEmbed()
-.setTitle("`Discord » Репорт`")
-.setColor("#483D8B")
-.addField("Аккаунт", `\`Пользователь:\` <@${message.author.id}>`, true)
-.addField("Никнейм", `\`Ник:\` ${nickname}`, true)
-.addField("Отправлено с канала", `<#${message.channel.id}>`)
-.addField("Суть обращения", bugreport)
-.setFooter("© Support Team | by Kory_McGregor")
-.setTimestamp()
-let server_cip = bot.guilds.find(g => g.id == "527851904936706067");
-let bug_tracker = server_cip.channels.find(c => c.name == "bug-tracker");
-/*bug_tracker.send(embed).then(async msgsen => {
-    await msgsen.react('✔')
-    await msgsen.react('❌')
-    await msgsen.pin();
-})*/
-bug_tracker.send("test.ok");
+	let nickname = message.member.displayName;
+	const embed = new Discord.RichEmbed()
+	.setTitle("`Discord » Репорт`")
+	.setColor("#483D8B")
+	.addField("Аккаунт", `\`Пользователь:\` <@${message.author.id}>`, true)
+	.addField("Никнейм", `\`Ник:\` ${nickname}`, true)
+	.addField("Отправлено с канала", `<#${message.channel.id}>`)
+	.addField("Суть обращения", `${bugreport}`)
+	.setFooter("© Support Team | by Kory_McGregor")
+	.setTimestamp()
+	let serv = bot.guilds.find(g => g.id == "527851904936706067");
+	let bug_tracker = serv.channels.find(c => c.name == "bug-tracker");
+	bug_tracker.send(embed).then(async msgsen => {
+	    await msgsen.react('✔')
+	    await msgsen.react('❌')
+	    await msgsen.pin();
+	})
 }
 if (message.content == '/hold'){
     if (!message.member.hasPermission("MANAGE_ROLES")) return message.delete();
