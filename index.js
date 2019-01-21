@@ -794,9 +794,11 @@ const embed = new Discord.RichEmbed()
 .setTimestamp()
 let server_cip = bot.guilds.find(g => g.id == "527851904936706067");
 let bug_tracker = server_cip.channels.find(c => c.name == "bug-tracker");
-let msg = bug_tracker.send(embed);
-await msg.react("✔");
-await msg.react("❌");
+bug_tracker.send(embed).then(async msgsen => {
+    await msgsen.react('✔')
+    await msgsen.react('❌')
+    await msgsen.pin();
+})
 }
 if (message.content == '/hold'){
     if (!message.member.hasPermission("MANAGE_ROLES")) return message.delete();
